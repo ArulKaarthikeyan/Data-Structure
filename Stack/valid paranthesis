@@ -1,0 +1,66 @@
+#include <stdio.h>
+
+int isfull(int top,int n){
+    if(top==n-1){
+        return 1;
+    }
+    return 0;
+}
+int isempty(int top ){
+    if(top==-1){
+        return 1;
+    }
+    return 0;
+}
+void push(char *arr,int *top,int n,char x){
+    if(isfull(*top,n)){
+        printf("\nStack overflow !");
+        return;
+    }
+    (*top)++;
+    arr[*top]=x;
+    
+}
+void pop(char *arr,int *top){
+    if(isempty(*top)){
+        printf("Stack underflow !");
+    }
+    (*top)--;
+    return ;
+}
+int check(char *arr,int top ,int n){
+    char temp[n];
+    int top1=-1;
+    for(int i=0;arr[i]!='\0';i++){
+        if(arr[i]=='[' || arr[i]=='{' || arr[i]=='('){
+            push(temp,&top1,n,arr[i]);
+    }
+        if(arr[i]==']' || arr[i]=='}' || arr[i]==')'){
+            if((temp[top1]=='[' && arr[i]==']') || (temp[top1]=='{' && arr[i]=='}') || (temp[top1]=='(' && arr[i]==')') ){
+                pop(temp,&top1);
+            }
+            else{
+                printf("Not valid");
+                return 0;
+            }
+        }
+    }
+    if(top1!=-1){
+        printf("Not valid");
+        return 0;
+    }
+    printf("Valid");
+    return 1;
+}
+int main() {
+    int n;
+    printf("Enter the size of Stack : ");
+    scanf("%d",&n);
+    char arr[n];
+    int top=-1; 
+    printf("Enter the Expression :");
+    scanf("%s",arr);
+    check(arr,top,n);
+    return 0;
+}
+    
