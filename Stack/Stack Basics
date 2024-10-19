@@ -1,65 +1,90 @@
 #include <stdio.h>
-void print(int arr[], int top){
+#include <stdlib.h>
+#include <limits.h>
+#define MAX 100
+
+int stack[MAX];
+int top = -1;
+void print(){
     if(top==-1){
-        printf("Empty Stack \n");
-    }
-    for(int i=0;i<top+1;i++){
-        printf("%d ",arr[i]);
+        printf("\nStack Underflow ");
+        return;
     }
     printf("\n");
-}
-int isfull(int top,int n){
-    if(top==n-1){
-        return 1;
+    for(int i=0;i<top;i++){
+        printf("%d | ",stack[i]);
     }
-    return 0;
+    printf("%d (top)\n",stack[top]);
 }
-int isempty(int top ){
-    if(top==-1){
-        return 1;
-    }
-    return 0;
+int isFull() {
+    return top == MAX - 1;
 }
-void push(int *arr,int *top,int n){
-    if(isfull(*top,n)){
-        printf("\nStack overflow !");
+
+int isEmpty() {
+    return top == -1;
+}
+
+void push(int item) {
+    if (isFull()) {
+        printf("Stack Overflow\n");
         return;
     }
-    (*top)++;
-     printf("Enter the element to push :"); int x;
-     scanf("%d",&x);
-    arr[*top]=x;
-    print(arr,*top);
-    
+    top++;
+    stack[top] = item;
+    printf("%d pushed to stack\n", item);
+    print();
 }
-void pop(int *arr,int *top){
-    if(isempty(*top)){
-        printf("Stack underflow !");
-        return;
+
+int pop() {
+    if (isEmpty()) {
+        printf("Stack Underflow\n");
+        return INT_MIN;
     }
-    (*top)--;
-    print(arr,*top);
+    top--;
+    printf("%d is popped",stack[top+1]); print();
+    return stack[top+1];
 }
+
+int peek() {
+    if (isEmpty()) {
+        printf("Stack is empty\n");
+        return INT_MIN;
+    }
+    printf("\npeek element is %d .",stack[top]);
+    return stack[top];
+}
+
 int main() {
-    int n;
-    printf("Enter the size of Stack : ");
-    scanf("%d",&n);
-    int arr[n],top=-1;
-    printf("1 . push\n2 . pop\n3 . exit\n");
+    printf("Enter the Stack operation :");
     int choice=0;
-    do{
-    printf("\nEnter the operation :");
+    printf("\n1 . push\n2 . pop\n3 . is full\n4 . is empty\n5 . peek\n6 . exit");
+    while(choice!=6){
+    printf("\nCHOOSE : ");
     scanf("%d",&choice);
     switch(choice){
         case 1:
-           push(arr,&top,n); 
+           int x;
+           printf("Enter the element :");
+           scanf("%d",&x);
+           push(x);
            break;
         case 2:
-            pop(arr,&top);
-            break;
+           pop();
+           break;
         case 3:
-             printf("Exiting...");
+          isFull()?printf("Stack is full"):printf("Stack is not full");
+          break;
+        case 4:
+           isEmpty()?printf("Stack is empty"):printf("Stack is not empty");
+          break;
+        case 5:
+            peek(); break;
+        case 6:
+           printf("\nExit Session......"); break;
+        default:
+           printf("\nEnter Valid operation !");
+        
     }
-    }while(choice!=3);
-       return 0;
+    }
+    return 0;
 }
