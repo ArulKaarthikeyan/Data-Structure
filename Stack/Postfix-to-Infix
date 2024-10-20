@@ -1,0 +1,56 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#define MAX 100
+char stack[MAX][MAX];
+int top = -1;
+int ispostfix(char *string){
+    int stacknum=0;
+    for(int i=0;i<strlen(string);i++){
+         if((string[i]>='a' && string[i]<='z')||(string[i]>='A' && string[i]<='Z') || (string[i]>='0' && string[i]<='9')){
+               stacknum++;
+        }
+          if(string[i]=='+' || string[i]=='-' || string[i]=='*' || string[i]=='/'){
+              stacknum-=2;
+              if(stacknum<0){
+                  printf("Not a postfix expression ");
+                  return 0;
+              }
+              stacknum++;
+          }
+    }
+    if(stacknum!=1){
+          printf("Not a postfix expression ");
+        return 0;
+    }
+    return 1;
+}
+void push(char *item) {
+    top++;
+    strcpy(stack[top],item);
+}
+char* pop() {
+    top--;
+    return stack[top+1];
+}
+int main() {
+    printf("Enter the postfix expression :");
+    char string[MAX],infix[MAX];
+    scanf("%s",string); char temp[2],A[MAX],B[MAX],C[MAX];
+    if(ispostfix(string)){
+    for(int i=0;i<strlen(string);i++){
+        temp[0]=string[i]; temp[1]='\0';
+        if((string[i]>='a' && string[i]<='z')||(string[i]>='A' && string[i]<='Z') || (string[i]>='0' && string[i]<='9')){
+            push(temp);
+        }
+        if(string[i]=='+' || string[i]=='-' || string[i]=='*' || string[i]=='/'){
+            strcpy(B,pop());
+            strcpy(A,pop());
+            sprintf(C, "(%s %s %s)", A, temp, B);
+            push(C);
+        }
+    }
+    printf("Infix : %s\n",stack[top]);
+}
+ return 0;   
+}
