@@ -1,0 +1,58 @@
+#include <stdio.h>
+#include <stdlib.h>
+struct node {
+    int id;
+    int burst;
+    struct node *next;
+};
+struct node *create(int value,int sno){
+  struct node *temp=(struct node *)malloc(sizeof(struct node));
+  temp->burst=value;
+  temp->next=NULL;
+  temp->id= sno;
+  return temp;
+}
+int main(){
+    printf("Enter the number of process : ");
+    int num,value;
+    scanf("%d",&num);
+    struct node *head,*last=NULL,*temp,*trash;
+    for(int i=0;i<num;i++){
+        printf("Enter the burst time of Process %d : ",i+1);
+        scanf("%d",&value);
+        temp=create(value,i+1);
+        if(i==0){
+            head=temp;
+        }
+        else{
+            last->next=temp;
+        }
+        last=temp;
+    }
+    last->next=head;
+    temp=head;
+    int quant;
+    printf("Enter the quantum number : ");
+    scanf("%d",&quant);
+    while(num>0){
+    if(temp->burst==0){
+        trash=temp;
+        temp=temp->next;
+        last->next=temp;
+        free(trash);
+        num--; 
+        continue;
+    }
+    if(temp->burst>quant){
+        printf("\nProcess %d has runned %d units .",temp->id,quant);
+        temp->burst=temp->burst-quant;
+    }
+    else{
+        printf("\nProcess %d has runned %d units .",temp->id,temp->burst);
+        temp->burst=0;
+    }
+    last=temp;
+    temp=temp->next;
+    continue;
+    }
+}
