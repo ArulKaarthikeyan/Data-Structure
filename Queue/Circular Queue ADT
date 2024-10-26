@@ -1,1 +1,136 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <limits.h>
+
+int *queue;
+int front = -1;
+int rear = -1;
+int SIZE;
+
+int isEmpty() {
+    return (front == -1);
+}
+
+int isFull() {
+    return ((rear + 1) % SIZE == front);
+}
+
+void enqueue(int value) {
+    if (isFull()) {
+        printf("Queue is full!\n");
+    } else {
+        if (isEmpty()) {
+            front = 0;
+        }
+        rear = (rear + 1) % SIZE;
+        queue[rear] = value;
+        printf("Enqueued: %d\n", value);
+    }
+}
+
+int dequeue() {
+    if (isEmpty()) {
+        printf("Queue is empty!\n");
+        return INT_MIN;
+    } else {
+        int dequeuedValue = queue[front];
+        if (front == rear) {
+            front = rear = -1;
+        } else {
+            front = (front + 1) % SIZE;
+        }
+        return dequeuedValue;
+    }
+}
+
+int frontElement() {
+    if (isEmpty()) {
+        printf("Queue is empty!\n");
+        return INT_MIN;
+    } else {
+        return queue[front];
+    }
+}
+
+int rearElement() {
+    if (isEmpty()) {
+        printf("Queue is empty!\n");
+        return INT_MIN;
+    } else {
+        return queue[rear];
+    }
+}
+
+void print() {
+    if (isEmpty()) {
+        printf("Queue is empty!\n");
+    } else {
+        printf("Queue : ");
+         printf("%d (front) ", queue[front]);
+        for (int i = front+1; i <= rear; i++) {
+            printf("| %d ", queue[i]);
+        }
+        printf("(rear)\n");
+    }
+}
+
+int main() {
+    int choice, value;
+
+    printf("Enter the size of the circular queue: ");
+    scanf("%d", &SIZE);
+    queue = (int *)malloc(SIZE * sizeof(int));
+
+    printf("\nQueue Operations:\n");
+    printf("1. Enqueue\n");
+    printf("2. Dequeue\n");
+    printf("3. Display Front Element\n");
+    printf("4. Display Rear Element\n");
+    printf("5. Check if Queue is Empty\n");
+    printf("6. Check if Queue is Full\n");
+    printf("7. Exit\n");
+
+    do {
+        printf("\nEnter your choice: ");
+        scanf("%d", &choice);
+        switch (choice) {
+            case 1:
+                printf("Enter value to enqueue: ");
+                scanf("%d", &value);
+                enqueue(value);
+                print();
+                break;
+            case 2: {
+                int temp = dequeue();
+                if (temp != INT_MIN) printf("Dequeued: %d\n", temp);
+                print();
+                break;
+            }
+            case 3:
+                value = frontElement();
+                if (value != INT_MIN)
+                    printf("Front element: %d\n", value);
+                break;
+            case 4:
+                value = rearElement();
+                if (value != INT_MIN)
+                    printf("Rear element: %d\n", value);
+                break;
+            case 5:
+                printf(isEmpty() ? "Queue is empty.\n" : "Queue is not empty.\n");
+                break;
+            case 6:
+                printf(isFull() ? "Queue is full.\n" : "Queue is not full.\n");
+                break;
+            case 7:
+                printf("Exiting...\n");
+                break;
+            default:
+                printf("Invalid choice. Please try again.\n");
+        }
+    } while (choice != 7);
+
+    free(queue);
+    return 0;
+}
 
