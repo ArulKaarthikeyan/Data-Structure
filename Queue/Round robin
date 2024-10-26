@@ -1,0 +1,74 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <limits.h>
+
+struct queue{
+    int id;
+    int burst;
+};
+
+int front = -1;
+int rear = -1;
+int SIZE=100;
+struct queue *p;
+
+int isEmpty() {
+    return (front == -1);
+}
+
+int isFull() {
+    return ((rear + 1) % SIZE == front);
+}
+
+void enqueue(struct queue var) {
+    if (isFull()) {
+        printf("Queue is full!\n");
+    } else {
+        if (isEmpty()) {
+            front = 0;
+        }
+        rear = (rear + 1) % SIZE;
+        p[rear]=var;
+    }
+}
+
+struct queue dequeue(){
+    struct queue val = p[front];
+    if (front == rear) {
+            front = rear = -1;
+    } else {
+            front = (front + 1) % SIZE;
+   }
+   return val;
+    
+}
+
+int main() {
+    int n, value,quantum,i=0;
+    struct queue var; 
+    p = (struct queue *)malloc(SIZE * sizeof(struct queue));
+    printf("Enter the number of process: ");
+    scanf("%d",&n);
+    for(int i=0;i<n;i++){
+         printf("Enter the Burst time of Process %d : ",i+1);
+          scanf("%d",&value);
+          var.id=i+1;
+          var.burst=value;
+          enqueue(var);
+    }
+    printf("Enter the Quantum number :");
+    scanf("%d",&quantum);
+ while (!isEmpty()) {
+        var = dequeue(); 
+        if (var.burst <= quantum) {
+            printf("Process %d has completed %d units.\n", var.id, var.burst);
+        } else {
+            var.burst -= quantum;
+            printf("Process %d has completed %d units.\n", var.id, quantum);
+            enqueue(var); 
+        }
+    }
+  
+    free(p);
+    return 0;
+}
