@@ -1,0 +1,95 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <limits.h>
+
+int *queue;
+int front = -1;
+int rear = -1;
+int SIZE=100;
+
+int isEmpty() {
+    return (front == -1);
+}
+
+void print() {
+    if (isEmpty()) {
+        printf("Queue is empty!\n");
+    } else {
+        printf("Queue : ");
+         printf("%d (front) ", queue[front]);
+        for (int i = front+1; i <= rear; i++) {
+            printf("| %d ", queue[i]);
+        }
+        printf("(rear)\n");
+    }
+}
+
+int isFull() {
+    return (rear == SIZE - 1);
+}
+
+void enqueue(int value) {
+    if (isFull()) {
+        printf("Queue is full!\n");
+    } else {
+        if (isEmpty()) {
+            front = 0;
+        }
+        rear++;
+        queue[rear] = value;
+    }
+}
+
+int dequeue() {
+    if (isEmpty()) {
+        printf("Queue is empty!\n");
+        return INT_MIN;
+    } else {
+        int value = queue[front];
+        front++;
+        if (front > rear) {
+            front = rear = -1;
+        }
+        return value;
+    }
+}
+
+void sort(){
+    int tempfront=0;
+    int temprear=-1;
+    int temp[SIZE];
+    while(!isEmpty()){
+        int current=dequeue();
+        while(temprear>=tempfront && current<temp[temprear]){
+            enqueue(temp[temprear]);
+            temprear--;
+        }
+    temprear++;
+    temp[temprear]=current;
+    }
+    while(tempfront<=temprear){
+        enqueue(temp[tempfront++]);
+    }
+}
+
+int main() {
+    int choice,value;
+    queue = (int *)malloc(SIZE * sizeof(int));
+    while(1){
+        printf("Enter value to enqueue : ");
+        scanf("%d", &value);
+        enqueue(value);
+        printf("Press 1 to enqueue : ");
+        scanf("%d",&choice);
+        if(choice!=1){
+              break;
+        }
+   }
+    printf("Before sorting :\n");          
+    sort();
+    printf("Ahter sorting :\n");
+    print();
+                
+    free(queue);
+    return 0;
+}
