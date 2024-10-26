@@ -46,11 +46,12 @@ int dequeue() {
         printf("Queue is empty!\n");
         return INT_MIN;
     } else {
+        int value = queue[front];
         front++;
         if (front > rear) {
             front = rear = -1;
         }
-        return queue[front-1];
+        return value;
     }
 }
 
