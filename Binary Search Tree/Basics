@@ -1,0 +1,140 @@
+#include<stdio.h>
+#include<stdlib.h>
+
+struct node{
+  int key;
+  struct node *right;
+  struct node *left;
+};
+
+struct node *create(int key){
+    struct node *newnode=(struct node *)malloc(sizeof(struct node));
+    newnode->key=key;
+    newnode->right = NULL;
+    newnode->left = NULL;
+    return newnode;
+}
+
+struct node *findmin(struct node *root){
+    if(root->left==NULL )     return root;
+    return findmin(root->left);
+}
+
+struct node *findmax(struct node *root){
+   if(root->right==NULL)   return root;
+   return findmax(root->right);
+}
+struct node *insert(struct node *root,int key){
+       if(root==NULL){  return create(key);  }
+       if(root->key==key){  return root; }
+       if(root->key < key ){  root->right=insert(root->right,key);   }
+       else{  root->left=insert(root->left,key); }
+       return root;
+}
+
+
+struct node *deletenode(struct node *root, int key) {
+    if (root == NULL) {
+        printf("\nElement not found ");
+        return root;
+    }
+    if (root->key < key) {
+        root->right = deletenode(root->right, key);
+    } else if (root->key > key) {
+        root->left = deletenode(root->left, key);
+    } else {
+        struct node *tmp = root;
+        if (root->right == NULL) {
+            root = root->left;
+            free(tmp);
+            printf("Element deleted successfully");
+            return root;
+        } else if (root->left == NULL) {
+            root = root->right;
+            free(tmp);
+            printf("Element deleted successfully");
+            return root;
+        } else {
+            struct node *replace = findmin(root->right);
+            root->key = replace->key;
+            root->right = deletenode(root->right, replace->key);
+        }
+    }
+    return root;
+}
+struct node *findnode(struct node *root , int key){
+     if(root==NULL || root->key ==key) {
+         return root ;
+     }
+    else if(root->key <key ) { return findnode(root->right, key); }
+    else { return findnode(root->left, key); }
+}
+
+
+void inorder(struct node *root){
+  if(root==NULL) return;
+  inorder(root->left);
+  printf("%d  ",root->key);
+  inorder(root->right);
+}
+
+void preorder(struct node *root){
+  if(root==NULL) return;
+  printf("%d  ",root->key);
+  preorder(root->left);
+  preorder(root->right);
+}
+
+void postorder(struct node *root){
+  if(root==NULL) return;
+  postorder(root->left);
+  postorder(root->right);
+  printf("%d  ",root->key);
+}
+
+int main(){
+    int num,val,choice=0;
+    struct node *root=NULL;
+   printf("Enter the number of nodes to insert : ");
+   scanf("%d",&num);
+   for(int i=0;i<num;i++){
+      printf("Enter the value : ");
+      scanf("%d",&val);
+      root=insert(root,val);
+   }
+   while(choice!=7){
+   printf("\n1 . Insert\n2 . Delete \n3 . Find minimum\n4 . Find Maximum\n5 . Search\n6 . Display\n7 . Exit\nEnter : ");
+   scanf("%d",&choice);
+switch(choice){
+   case 1:
+       printf("\nEnter the element to insert : ");
+       scanf("%d",&val);
+       insert(root,val);
+       printf("Element inserted successfully"); break;
+   case 2:
+        printf("\nEnter the element to delete : ");
+       scanf("%d",&val);
+       deletenode(root,val);
+        break;
+   case 3:
+       printf("\nMinimum Element : %d ",findmin(root)->key); break;
+   case 4:
+       printf("\nMaximum Element : %d ",findmax(root)->key); break;
+   case 5:
+       printf("\nEnter the element to search : ");
+       scanf("%d",&val);
+       printf("Element %d : %s .",val,findnode(root,val)!=NULL ? "found" : "not found");
+       break;
+   case 6:
+       printf("Inorder : ");
+       inorder(root); printf("\n");
+       printf("Preorder : ");
+      preorder(root); printf("\n");
+      printf("Postorder : ");
+      postorder(root); printf("\n"); break;
+   case 7:
+       printf("Exiting.....");
+       break;
+}
+}
+}
