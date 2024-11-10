@@ -1,0 +1,69 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+struct Node {
+    char word[100];
+    struct Node *left, *right;
+};
+
+struct Node* newNode(char word[]) {
+    struct Node* node = (struct Node*)malloc(sizeof(struct Node));
+    strcpy(node->word, word);
+    node->left = node->right = NULL;
+    return node;
+}
+
+struct Node* insert(struct Node* root, char word[]) {
+    if (root == NULL) return newNode(word);
+    if (strcmp(word, root->word) < 0) 
+        root->left = insert(root->left, word);
+    else if(strcmp(word,root->word)==0)
+        return root;
+    else
+        root->right = insert(root->right, word);
+    return root;
+}
+
+int searchWord(struct Node* root, char word[]) {
+    if (root == NULL) return 0;
+    int comparison = strcmp(word, root->word);
+    if (comparison == 0) return 1;
+    else if (comparison < 0) return searchWord(root->left, word);
+    else return searchWord(root->right, word);
+}
+
+void searchPrefix(struct Node* root, char prefix[]) {
+    if (root == NULL) return;
+    if (strncmp(root->word, prefix, strlen(prefix))==0) {
+        printf("%s\n", root->word);
+    }
+    if (strcmp(prefix, root->word) < 0)
+        searchPrefix(root->left, prefix);
+    else
+        searchPrefix(root->right, prefix);
+}
+
+int main() {
+    struct Node* root = NULL;
+    root = insert(root, "airplane");
+    root = insert(root, "apple");
+    root = insert(root, "banana");
+    root = insert(root, "bat");
+    root = insert(root, "batman");
+    root = insert(root, "ball");
+    root = insert(root, "orange");
+    root = insert(root, "oracle");
+
+    char wordToCheck[100];
+    printf("Enter a word to check spelling: ");
+    scanf("%s", wordToCheck);
+    
+    if (searchWord(root, wordToCheck)) {
+        printf("The word '%s' is correct!\n", wordToCheck);
+    } else {
+        printf("The word '%s' is incorrect. Suggestions:\n", wordToCheck);
+        searchPrefix(root, wordToCheck);
+    }
+    return 0;
+}
