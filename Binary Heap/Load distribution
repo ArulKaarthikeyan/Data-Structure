@@ -1,0 +1,126 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+#define MAX_RESOURCES 5
+
+typedef struct {
+    int id;
+    int load;
+} Resource;
+
+Resource heap[MAX_RESOURCES];
+int size = 0;
+
+void swap(int i, int j) {
+    Resource temp = heap[i];
+    heap[i] = heap[j];
+    heap[j] = temp;
+}
+
+void percolateup(int index) {
+    while (index > 0) {
+        int parent = (index - 1) / 2;
+        if (heap[index].load < heap[parent].load) {
+            swap(index, parent);
+            index = parent;
+        } else {
+            break;
+        }
+    }
+}
+
+void percolatedown(int index) {
+    int min = index;
+    int left = 2 * index + 1;
+    int right = 2 * index + 2;
+    if (left < size && heap[left].load < heap[min].load) {
+        min = left;
+    }
+    if (right < size && heap[right].load < heap[min].load) {
+        min = right;
+    }
+    if (min != index) {
+        swap(index, min);
+        percolatedown(min);
+    }
+}
+
+
+void insert(Resource resource) {
+    if (size == MAX_RESOURCES) {
+        printf("Heap overflow\n");
+        return;
+    }
+    heap[size] = resource;
+    size++;
+    percolateup(size - 1);
+}
+
+void assignTask(int taskLoad) {
+    if (size == 0) {
+        printf("No resources available\n");
+        return;
+    }
+    heap[0].load += taskLoad;
+
+    percolatedown(0);
+}
+
+void printHeap() {
+    printf("Resource ID | Load\n");
+    for (int i = 0; i < size; i++) {
+        printf("%d           | %d\n", heap[i].id, heap[i].load);
+    }
+}
+
+int main() {
+    int choice, taskLoad , numsize;
+    Resource temp;
+    printf("Enter the number of resources (max %d): ", MAX_RESOURCES);
+    scanf("%d", &numsize);
+    if (size > MAX_RESOURCES) {
+        printf("Exceeds maximum allowed resources. Setting size to %d.\n", MAX_RESOURCES);
+        numsize = MAX_RESOURCES;
+    }
+  
+    for (int i = 0; i < numsize; i++) {
+        printf("Enter Resource ID and initial load for Resource %d: ", i + 1);
+        scanf("%d %d", &temp.id, &temp.load);
+        insert(temp);
+    }
+
+    while (1) {
+        printf("\nChoose an operation:\n");
+        printf("1. Assign Task\n");
+        printf("2. Add Resource\n");
+        printf("3. Print\n");
+        printf("4. Exit\n");
+        printf("Enter your choice: ");
+        scanf("%d", &choice);
+
+        switch (choice) {
+            case 1:
+                printf("Enter task load: ");
+                scanf("%d", &taskLoad);
+                assignTask(taskLoad);
+                printf("Task assigned. Updated resource loads:\n");
+                printHeap();
+                break;
+            case 2:
+                 printf("Enter new Resource ID and initial load for Resource: ");
+                scanf("%d %d", &temp.id, &temp.load);
+                insert(temp);
+                printHeap();
+                break;
+            case 3:
+                printHeap();
+                break;
+            case 4:
+                printf("Exiting...\n");
+                return 0;
+            default:
+                printf("Invalid choice! Please try again.\n");
+                break;
+        }
+    }
+}
