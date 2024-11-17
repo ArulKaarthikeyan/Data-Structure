@@ -1,0 +1,17 @@
+import matplotlib.pyplot as plt
+import pandas as pd
+data = pd.read_csv("/content/data.csv", names=['Sorting Algorithm', 'Time', 'Array Size'])
+data = data.sort_values(by="Array Size", ascending=True)
+algorithms = data['Sorting Algorithm'].unique()
+for algo in algorithms:
+    algo_data = data[data['Sorting Algorithm'] == algo]
+    sizes = list(algo_data['Array Size'].values)
+    times = list(algo_data['Time'].values)
+    plt.plot(sizes, times, label=algo,ls='-')
+
+plt.xlabel("Array Size")
+plt.ylabel("Time (seconds)")
+plt.title("Sorting Algorithm Performance")
+plt.legend()
+plt.show()
+
