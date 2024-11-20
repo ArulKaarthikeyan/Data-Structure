@@ -1,0 +1,233 @@
+#include <stdio.h>
+#include <time.h>
+#include<stdlib.h>
+void print(int arr[],int len){
+  printf("\n");
+  for(int i=0;i<len;i++){
+      printf("%d ",arr[i]);
+   }
+}
+void swap(int *a,int *b){
+    int temp=*a;
+    *a=*b;
+    *b=temp;
+}
+void merge(int *left,int *right,int *arr,int length){
+    int leftsize=length/2,rightsize=length-leftsize;
+    int i=0,l=0,r=0;
+    while(l<leftsize && r<rightsize){
+        if(left[l]<right[r]){arr[i]=left[l];i++;l++;}
+        else {arr[i]=right[r];i++;r++;}
+    }
+    while(l<leftsize){ arr[i]=left[l]; i++; l++; }
+    while(r<rightsize){ arr[i]=right[r]; i++; r++; }
+}
+
+void mergesort(int *arr,int length){
+    if(length<=1) return;
+    int middle=length/2;
+    int left[middle],right[length-middle];
+    int r=0;
+    for(int i=0;i<length;i++){
+        if(i<middle){ left[i]=arr[i]; }
+        else{ right[r]=arr[i]; r++; }
+    }
+    mergesort(left,middle);
+    mergesort(right,length-middle);
+    merge(left,right,arr,length);
+}
+
+int partition(int *arr,int start,int end){
+    int pivot=arr[end];
+    int i=start-1;
+    for(int j=start;j<=end-1;j++){
+        if(arr[j]<pivot){
+            i++;
+            swap(&arr[i],&arr[j]);
+        }
+    }
+        i++;
+        swap(&arr[i],&arr[end]);
+    return i;
+}
+
+void quicksort(int *arr,int start,int end){
+    if(end<=start) return;
+    int pivot=partition(arr,start,end);
+    quicksort(arr,start,pivot-1);
+    quicksort(arr,pivot+1,end);
+
+}
+
+void heapify(int arr[], int n, int i) {
+    int largest = i;
+    int left = 2 * i + 1;
+    int right = 2 * i + 2;
+
+    if (left < n && arr[left] > arr[largest])
+      largest = left;
+
+    if (right < n && arr[right] > arr[largest])
+      largest = right;
+
+    if (largest != i) {
+      swap(&arr[i], &arr[largest]);
+      heapify(arr, n, largest);
+    }
+}
+
+ void heapsort(int arr[], int n) {
+    for (int i = n / 2 - 1; i >= 0; i--)
+      heapify(arr, n, i);
+    for (int i = n - 1; i >= 0; i--) {
+      swap(&arr[0], &arr[i]);
+      heapify(arr, i, 0);
+    }
+ }
+
+ void insertionsort(int *arr, int len) {
+    for (int i=1; i<len; i++) {
+        int key = arr[i];
+        int j = i-1;
+        for(j= i-1;j>=0 && arr[j]>key;j--) {
+            arr[j + 1] = arr[j];
+        }
+        arr[j + 1] = key;
+    }
+}
+
+void bubblesort(int *arr, int len) {
+    for (int i = 0; i < len - 1; i++) {
+        for (int j = 0; j < len - i - 1; j++) {
+            if (arr[j] > arr[j + 1])
+                swap(arr + j, arr + j + 1);
+        }
+    }
+}
+
+void selectionsort(int *arr, int len) {
+    for (int i = 0; i < len - 1; i++) {
+        int min_idx = i;
+        for (int j = i + 1; j < len; j++) {
+            if (arr[j] < arr[min_idx]) {
+                min_idx = j;
+            }
+        }
+        swap(arr+i,arr+min_idx);
+    }
+}
+
+void shellsort(int *arr,int len){
+    for(int gap=len/2;gap>0;gap/=2){
+        for(int i=gap;i<len;i++){
+            int temp=arr[i],j;
+            for(j=i;j>=gap && arr[j-gap]>temp;j-=gap){
+                  arr[j]=arr[j-gap];
+            }
+            arr[j]=temp;
+        }
+    }
+}
+
+int main() {
+ int choice,len;
+ FILE *fptr = fopen("C:\\Users\\arulk\\OneDrive\\Desktop\\Sorting\\data.csv","a");
+ clock_t start,end;
+ srand(time(0));
+
+    while (1) {
+        printf("\nChoose a sorting algorithm:\n");
+        printf("1. Merge Sort\n");
+        printf("2. Heap Sort\n");
+        printf("3. Insertion Sort\n");
+        printf("4. Bubble Sort\n");
+        printf("5. Selection Sort\n");
+        printf("6. Shell Sort\n");
+        printf("7. Quick Sort\n");
+        printf("8. Exit\n");
+        printf("Enter your choice: ");
+        scanf("%d", &choice);
+        if (choice == 8) {
+            break;
+        }
+        printf("Enter the length of the array: ");
+        scanf("%d", &len);
+        int arr[len];
+        for (int i = 0; i < len; i++) {
+            arr[i] = rand() % 100;
+        }
+       print(arr, len);
+        switch (choice) {
+            case 1:
+                mergesort(arr, len);
+                break;
+            case 2:
+                heapsort(arr, len);
+                break;
+            case 3:
+                insertionsort(arr, len);
+                break;
+            case 4:
+                bubblesort(arr, len);
+                break;
+            case 5:
+                selectionsort(arr, len);
+                break;
+            case 6:
+                shellsort(arr, len);
+                break;
+            case 7:
+                quicksort(arr, 0, len - 1);
+                break;
+            default:
+                printf("Invalid choice, please try again.\n");
+                continue;
+        }
+       print(arr, len);
+    }
+ for(int len=1000;len<5000;len+=100)
+ {
+ int arr[len];
+ for(int i=0;i<len;i++){
+     arr[i]=rand()%100 ;
+ }
+ start=clock();
+ mergesort(arr,len);
+ end=clock();
+ fprintf(fptr,"mergesort,%f,%d\n",(double)(end-start)/CLOCKS_PER_SEC,len);
+
+ start=clock();
+ heapsort(arr,len);
+ end=clock();
+ fprintf(fptr,"heapsort,%f,%d\n",(double)(end-start)/CLOCKS_PER_SEC,len);
+
+ start=clock();
+ insertionsort(arr,len);
+ end=clock();
+ fprintf(fptr,"insertionsort,%f,%d\n",(double)(end-start)/CLOCKS_PER_SEC,len);
+
+ start=clock();
+ bubblesort(arr,len);
+ end=clock();
+ fprintf(fptr,"bubblesort,%f,%d\n",(double)(end-start)/CLOCKS_PER_SEC,len);
+
+ start=clock();
+ selectionsort(arr,len);
+ end=clock();
+ fprintf(fptr,"selectionsort,%f,%d\n",(double)(end-start)/CLOCKS_PER_SEC,len);
+
+ start=clock();
+ shellsort(arr,len);
+ end=clock();
+ fprintf(fptr,"shellsort,%f,%d\n",(double)(end-start)/CLOCKS_PER_SEC,len);
+
+ start=clock();
+ quicksort(arr,0,len-1);
+ end=clock();
+ fprintf(fptr,"quicksort,%f,%d\n",(double)(end-start)/CLOCKS_PER_SEC,len);
+
+ printf("Exiting.....");
+}
+   fclose(fptr);
+    return 0;
+}
