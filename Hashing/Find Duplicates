@@ -1,0 +1,62 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <limits.h>
+
+#define EMPTY INT_MIN
+
+int hash(int key, int size) {
+    return key % size;
+}
+
+int insertHash(int *hashTable, int size, int key) {
+    int index = hash(key, size);
+    while (hashTable[index] != EMPTY) {
+        if (hashTable[index] == key) {
+            return 0;
+        }
+        index = (index + 1) % size;
+    }
+    hashTable[index] = key;
+    return 1;
+}
+
+void detectDuplicates(int *arr, int n) {
+    int *hashTable = (int*)malloc(n * sizeof(int));
+    for (int i = 0; i < n; i++) {
+        hashTable[i] = EMPTY;
+    }
+
+    int foundDuplicate = 0;
+    for (int i = 0; i < n; i++) {
+        printf("\n");
+        if (insertHash(hashTable, n, arr[i]) == 0) {
+            printf("Duplicate found: %d\n", arr[i]);
+            foundDuplicate++;
+        }
+    }
+
+    if (!foundDuplicate) {
+        printf("\nNo duplicates found.\n");
+    }
+
+    free(hashTable);
+}
+
+int main() {
+    int n;
+    printf("Enter the number of elements: ");
+    scanf("%d", &n);
+
+    int *arr = (int*)malloc(n * sizeof(int));
+
+    for (int i = 0; i < n; i++) {
+        printf("Enter the Element :");
+        scanf("%d", &arr[i]);
+    }
+
+    detectDuplicates(arr, n);
+
+    free(arr);
+    
+    return 0;
+}
