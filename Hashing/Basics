@@ -1,0 +1,323 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <limits.h>
+
+#define SIZE 7
+#define EMPTY INT_MIN  // Use INT_MIN to mark empty slots in open addressing
+
+// Node structure for Separate Chaining
+typedef struct Node {
+    int data;
+    struct Node* next;
+} Node;
+
+// Hash Tables for different probing methods
+int linearHashTable[SIZE];
+int quadraticHashTable[SIZE];
+int doubleHashTable[SIZE];
+Node* chain[SIZE];
+
+// Function Prototypes
+void initializeTables();
+void initializeChain();
+int hash(int key);
+int hash2(int key);  // Secondary hash function for double hashing
+
+// Linear Probing Functions
+void insertLinear(int key);
+void deleteLinear(int key);
+int searchLinear(int key);
+void printLinearTable();
+
+// Quadratic Probing Functions
+void insertQuadratic(int key);
+void deleteQuadratic(int key);
+int searchQuadratic(int key);
+void printQuadraticTable();
+
+// Double Hashing Functions
+void insertDouble(int key);
+void deleteDouble(int key);
+int searchDouble(int key);
+void printDoubleTable();
+
+// Separate Chaining Functions
+void insertChain(int key);
+void deleteChain(int key);
+int searchChain(int key);
+void printChainTable();
+
+// Utility Functions
+void printMenu();
+
+// Hash functions
+int hash(int key) {
+    return key % SIZE;
+}
+
+int hash2(int key) {
+    return 5 - (key % 5);  // Secondary hash function
+}
+
+// Initialize all tables
+void initializeTables() {
+    for (int i = 0; i < SIZE; i++) {
+        linearHashTable[i] = EMPTY;
+        quadraticHashTable[i] = EMPTY;
+        doubleHashTable[i] = EMPTY;
+        chain[i] = NULL;
+    }
+}
+
+// Linear Probing Functions
+void insertLinear(int key) {
+    int index = hash(key);
+    int start = index;
+    while (linearHashTable[index] != EMPTY) {
+        index = (index + 1) % SIZE;
+        if (index == start) {
+            printf("Table full, cannot insert %d.\n", key);
+            return;
+        }
+    }
+    linearHashTable[index] = key;
+}
+
+void deleteLinear(int key) {
+    int index = searchLinear(key);
+    if (index != -1) {
+        linearHashTable[index] = EMPTY;
+    } else {
+        printf("Key %d not found.\n", key);
+    }
+}
+
+int searchLinear(int key) {
+    int index = hash(key);
+    int start = index;
+    while (linearHashTable[index] != EMPTY) {
+        if (linearHashTable[index] == key) return index;
+        index = (index + 1) % SIZE;
+        if (index == start) break;
+    }
+    return -1;
+}
+
+void printLinearTable() {
+    for (int i = 0; i < SIZE; i++) {
+        if (linearHashTable[i] == EMPTY) printf("Index %d: EMPTY\n", i);
+        else printf("Index %d: %d\n", i, linearHashTable[i]);
+    }
+}
+
+// Quadratic Probing Functions
+void insertQuadratic(int key) {
+    int index = hash(key);
+    int i = 0;
+    while (quadraticHashTable[(index + i * i) % SIZE] != EMPTY) {
+        i++;
+        if (i >= SIZE) {
+            printf("Table full, cannot insert %d.\n", key);
+            return;
+        }
+    }
+    quadraticHashTable[(index + i * i) % SIZE] = key;
+}
+
+void deleteQuadratic(int key) {
+    int index = searchQuadratic(key);
+    if (index != -1) {
+        quadraticHashTable[index] = EMPTY;
+    } else {
+        printf("Key %d not found.\n", key);
+    }
+}
+
+int searchQuadratic(int key) {
+    int index = hash(key);
+    int i = 0;
+    while (quadraticHashTable[(index + i * i) % SIZE] != EMPTY) {
+        if (quadraticHashTable[(index + i * i) % SIZE] == key) return (index + i * i) % SIZE;
+        i++;
+        if (i >= SIZE) break;
+    }
+    return -1;
+}
+
+void printQuadraticTable() {
+    for (int i = 0; i < SIZE; i++) {
+        if (quadraticHashTable[i] == EMPTY) printf("Index %d: EMPTY\n", i);
+        else printf("Index %d: %d\n", i, quadraticHashTable[i]);
+    }
+}
+
+// Double Hashing Functions
+void insertDouble(int key) {
+    int index = hash(key);
+    int step = hash2(key);
+    int i = 0;
+    while (doubleHashTable[(index + i * step) % SIZE] != EMPTY) {
+        i++;
+        if (i >= SIZE) {
+            printf("Table full, cannot insert %d.\n", key);
+            return;
+        }
+    }
+    doubleHashTable[(index + i * step) % SIZE] = key;
+}
+
+void deleteDouble(int key) {
+    int index = searchDouble(key);
+    if (index != -1) {
+        doubleHashTable[index] = EMPTY;
+    } else {
+        printf("Key %d not found.\n", key);
+    }
+}
+
+int searchDouble(int key) {
+    int index = hash(key);
+    int step = hash2(key);
+    int i = 0;
+    while (doubleHashTable[(index + i * step) % SIZE] != EMPTY) {
+        if (doubleHashTable[(index + i * step) % SIZE] == key) return (index + i * step) % SIZE;
+        i++;
+        if (i >= SIZE) break;
+    }
+    return -1;
+}
+
+void printDoubleTable() {
+    for (int i = 0; i < SIZE; i++) {
+        if (doubleHashTable[i] == EMPTY) printf("Index %d: EMPTY\n", i);
+        else printf("Index %d: %d\n", i, doubleHashTable[i]);
+    }
+}
+
+// Separate Chaining Functions
+void insertChain(int value) {
+    int key = hash(value);
+    Node* newNode = (Node*)malloc(sizeof(Node));
+    newNode->data = value;
+    newNode->next = NULL;
+
+    // If no node exists at this index, set newNode
+    if (chain[key] == NULL) {
+        chain[key] = newNode;
+    } else {
+        // Append to the end of the list to avoid collision
+        Node* temp = chain[key];
+        while (temp->next != NULL) {
+            temp = temp->next;
+        }
+        temp->next = newNode;
+    }
+}
+
+void deleteChain(int value) {
+    int key = hash(value);
+    Node* current = chain[key];
+    Node* prev = NULL;
+
+    while (current != NULL) {
+        if (current->data == value) {
+            if (prev == NULL) {
+                chain[key] = current->next;  // Remove the first node
+            } else {
+                prev->next = current->next;  // Bypass the current node
+            }
+            free(current);
+            printf("Key %d deleted successfully.\n", value);
+            return;
+        }
+        prev = current;
+        current = current->next;
+    }
+    printf("Key %d not found for deletion.\n", value);
+}
+
+// Search for a key in the chain
+int searchChain(int value) {
+    int key = hash(value);
+    Node* temp = chain[key];
+    while (temp != NULL) {
+        if (temp->data == value) {
+            return key;
+        }
+        temp = temp->next;
+    }
+    return -1;
+}
+
+void printChainTable() {
+    for (int i = 0; i < SIZE; i++) {
+        Node* temp = chain[i];
+        printf("chain[%d] -->", i);
+        while (temp != NULL) {
+            printf(" %d -->", temp->data);
+            temp = temp->next;
+        }
+        printf(" NULL\n");
+    }
+}
+
+// Print the main menu
+void printMenu() {
+    printf("\n--- Collision Handling Methods ---\n");
+    printf("1. Linear Probing\n2. Quadratic Probing\n3. Double Hashing\n4. Separate Chaining\n5. Exit\n");
+}
+
+int main() {
+    initializeTables();
+    int method, choice, key;
+
+    while (1) {
+        printMenu();
+        printf("Choose a method (1-5): ");
+        scanf("%d", &method);
+
+        if (method == 5) break;  // Exit condition
+
+        while (1) {
+            printf("\n1. Insert\n2. Delete\n3. Search\n4. Print Table\n5. Back\nChoose an operation: ");
+            scanf("%d", &choice);
+
+            if (choice == 5) break;
+            if (choice < 4) {
+                printf("Enter the key: ");
+                scanf("%d", &key);
+            }
+
+            switch (method) {
+                case 1:  // Linear Probing
+                    if (choice == 1) insertLinear(key);
+                    else if (choice == 2) deleteLinear(key);
+                    else if (choice == 3) printf(searchLinear(key) != -1 ? "Key found!\n" : "Key not found.\n");
+                    else printLinearTable();
+                    break;
+                case 2:  // Quadratic Probing
+                    if (choice == 1) insertQuadratic(key);
+                    else if (choice == 2) deleteQuadratic(key);
+                    else if (choice == 3) printf(searchQuadratic(key) != -1 ? "Key found!\n" : "Key not found.\n");
+                    else printQuadraticTable();
+                    break;
+                case 3:  // Double Hashing
+                    if (choice == 1) insertDouble(key);
+                    else if (choice == 2) deleteDouble(key);
+                    else if (choice == 3) printf(searchDouble(key) != -1 ? "Key found!\n" : "Key not found.\n");
+                    else printDoubleTable();
+                    break;
+                case 4:  // Separate Chaining
+                    if (choice == 1) insertChain(key);
+                    else if (choice == 2) deleteChain(key);
+                    else if (choice == 3) printf(searchChain(key) != -1 ? "Key found!\n" : "Key not found.\n");
+
+                    else printChainTable();
+                    break;
+                default:
+                    printf("Invalid method. Try again.\n");
+            }
+        }
+    }
+    return 0;
+}
