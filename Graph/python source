@@ -1,0 +1,17 @@
+import networkx as nx
+import matplotlib.pyplot as plt
+G = nx.Graph()
+file = open('/content/graph.txt', 'r')
+vertices = file.readline().strip().split() 
+G.add_nodes_from(vertices) 
+for line in file:
+    edge = line.strip().split()
+    if len(edge) == 2: 
+        G.add_edge(edge[0], edge[1])
+
+file.close()  
+
+plt.figure(figsize=(8, 6))
+nx.draw(G, with_labels=True, node_color='skyblue', node_size=700, font_size=15, font_weight='bold')
+plt.title("Graph Visualization")
+plt.show()
