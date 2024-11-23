@@ -96,12 +96,36 @@ void printAdjMatrix() {
       printf("\n");
    }
 }
+void saveGraphToFile() {
+   FILE *file = fopen("C:\\Users\\arulk\\OneDrive\\Desktop\\Graph\\graph.txt", "w");  // Ensure correct file path
+   if (file == NULL) {
+      printf("Error opening file for writing.\n");
+      return;
+   }
 
+   // Write vertices on the first line
+   for (int i = 0; i < vertexCount; i++) {
+      fprintf(file, "%c ", lstVertices[i]->label);
+   }
+   fprintf(file, "\n");
+
+   // Write edges on subsequent lines
+   for (int i = 0; i < vertexCount; i++) {
+      for (int j = i + 1; j < vertexCount; j++) {
+         if (adjMatrix[i][j] == 1) {
+            fprintf(file, "%c %c\n", lstVertices[i]->label, lstVertices[j]->label);
+         }
+      }
+   }
+
+   fclose(file);
+   printf("Graph saved to file.\n");
+}
 int main() {
    int choice;
    char label1, label2;
-   for (int i = 0; i < MAX; i++) 
-      for (int j = 0; j < MAX; j++) 
+   for (int i = 0; i < MAX; i++)
+      for (int j = 0; j < MAX; j++)
          adjMatrix[i][j] = 0;
 
    while (1) {
@@ -142,6 +166,7 @@ int main() {
             breadthFirstSearch();
             break;
          case 6:
+             saveGraphToFile();
             printf("Exiting...\n");
             exit(0);
          default:
