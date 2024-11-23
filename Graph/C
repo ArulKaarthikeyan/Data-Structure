@@ -1,0 +1,296 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+#define MAX 10
+
+struct Vertex {
+   char label;
+   int visited;
+};
+
+// Stack and Queue variables
+int stack[MAX], top = -1;
+int queue[MAX], rear = -1, front = 0, queueItemCount = 0;
+
+// Graph variables
+struct Vertex* lstVertices[MAX];
+int adjMatrix[MAX][MAX];
+int vertexCount = 0;
+
+// Stack functions
+void push(int item) { stack[++top] = item; }
+int pop() { return stack[top--]; }
+int peek() { return stack[top]; }
+int isStackEmpty() { return top == -1; }
+
+// Queue functions
+void insert(int data) { queue[++rear] = data; queueItemCount++; }
+int removeData() { queueItemCount--; return queue[front++]; }
+int isQueueEmpty() { return queueItemCount == 0; }
+
+// Graph functions
+void addVertex(char label) {
+   struct Vertex* vertex = (struct Vertex*)malloc(sizeof(struct Vertex));
+   vertex->label = label;
+   vertex->visited = 0;
+   lstVertices[vertexCount++] = vertex;
+}
+
+void addEdge(int start, int end) {
+   adjMatrix[start][end] = 1;
+   adjMatrix[end][start] = 1;
+}
+
+void displayVertex(int vertexIndex) { printf("%c ", lstVertices[vertexIndex]->label); }
+
+int getAdjUnvisitedVertex(int vertexIndex) {
+   for (int i = 0; i < vertexCount; i++)
+      if (adjMatrix[vertexIndex][i] == 1 && lstVertices[i]->visited == 0)
+         return i;
+   return -1;
+}
+
+void depthFirstSearch() {
+   printf("Depth First Search: ");
+   lstVertices[0]->visited = 1;
+   displayVertex(0);
+   push(0);
+   while (!isStackEmpty()) {
+      int unvisitedVertex = getAdjUnvisitedVertex(peek());
+      if (unvisitedVertex == -1) {
+         pop();
+      } else {
+         lstVertices[unvisitedVertex]->visited = 1;
+         displayVertex(unvisitedVertex);
+         push(unvisitedVertex);
+      }
+   }
+   for (int i = 0; i < vertexCount; i++) lstVertices[i]->visited = 0;
+   printf("\n");
+}
+
+void breadthFirstSearch() {
+   printf("Breadth First Search: ");
+   lstVertices[0]->visited = 1;
+   displayVertex(0);
+   insert(0);
+   while (!isQueueEmpty()) {
+      int tempVertex = removeData();
+      int unvisitedVertex;
+      while ((unvisitedVertex = getAdjUnvisitedVertex(tempVertex)) != -1) {
+         lstVertices[unvisitedVertex]->visited = 1;
+         displayVertex(unvisitedVertex);
+         insert(unvisitedVertex);
+      }
+   }
+   for (int i = 0; i < vertexCount; i++) lstVertices[i]->visited = 0;
+   printf("\n");
+}
+
+void printAdjMatrix() {
+   printf("\nAdjacency Matrix:\n");
+   for (int i = 0; i < vertexCount; i++) {
+      for (int j = 0; j < vertexCount; j++) {
+         printf("%d ", adjMatrix[i][j]);
+      }
+      printf("\n");
+   }
+}
+
+// Check if two vertices are adjacent
+void checkAdjacency(char label1, char label2) {
+   int start = -1, end = -1;
+   for (int i = 0; i < vertexCount; i++) {
+      if (lstVertices[i]->label == label1) start = i;
+      if (lstVertices[i]->label == label2) end = i;
+   }
+   if (start != -1 && end != -1) {
+      if (adjMatrix[start][end] == 1) 
+         printf("Vertices %c and %c are adjacent.\n", label1, label2);
+      else 
+         printf("Vertices %c and %c are not adjacent.\n", label1, label2);
+   } else {
+      printf("One or both vertices not found!\n");
+   }
+}
+
+// Get neighbors of a vertex
+void getNeighbors(char label) {
+   int vertexIndex = -1;
+   for (int i = 0; i < vertexCount; i++) {
+      if (lstVertices[i]->label == label) {
+         vertexIndex = i;
+         break;
+      }
+   }
+
+   if (vertexIndex != -1) {
+      printf("Neighbors of %c: ", label);
+      for (int j = 0; j < vertexCount; j++) {
+         if (adjMatrix[vertexIndex][j] == 1) {
+            printf("%c ", lstVertices[j]->label);
+         }
+      }
+      printf("\n");
+   } else {
+      printf("Vertex not found!\n");
+   }
+}
+
+// Remove an edge
+void removeEdge(char label1, char label2) {
+   int start = -1, end = -1;
+   for (int i = 0; i < vertexCount; i++) {
+      if (lstVertices[i]->label == label1) start = i;
+      if (lstVertices[i]->label == label2) end = i;
+   }
+   if (start != -1 && end != -1) {
+      adjMatrix[start][end] = 0;
+      adjMatrix[end][start] = 0;
+      printf("Edge between %c and %c removed.\n", label1, label2);
+   } else {
+      printf("One or both vertices not found!\n");
+   }
+}
+
+// Remove a vertex
+void removeVertex(char label) {
+   int vertexIndex = -1;
+   for (int i = 0; i < vertexCount; i++) {
+      if (lstVertices[i]->label == label) {
+         vertexIndex = i;
+         break;
+      }
+   }
+   if (vertexIndex == -1) {
+      printf("Vertex not found!\n");
+      return;
+   }
+
+   // Shift vertices in the list to remove the vertex
+   for (int i = vertexIndex; i < vertexCount - 1; i++) {
+      lstVertices[i] = lstVertices[i + 1];
+   }
+
+   // Shift rows in the adjacency matrix
+   for (int i = vertexIndex; i < vertexCount - 1; i++) {
+      for (int j = 0; j < vertexCount; j++) {
+         adjMatrix[i][j] = adjMatrix[i + 1][j];
+      }
+   }
+
+   // Shift columns in the adjacency matrix
+   for (int i = 0; i < vertexCount; i++) {
+      for (int j = vertexIndex; j < vertexCount - 1; j++) {
+         adjMatrix[i][j] = adjMatrix[i][j + 1];
+      }
+   }
+
+   vertexCount--;
+   printf("Vertex %c removed.\n", label);
+}
+
+void saveGraphToFile() {
+   FILE *file = fopen("graph.txt", "w");
+   if (file == NULL) {
+      printf("Error opening file for writing.\n");
+      return;
+   }
+
+   // Write vertices
+   for (int i = 0; i < vertexCount; i++) {
+      fprintf(file, "%c ", lstVertices[i]->label);
+   }
+   fprintf(file, "\n");
+
+   // Write edges
+   for (int i = 0; i < vertexCount; i++) {
+      for (int j = i + 1; j < vertexCount; j++) {
+         if (adjMatrix[i][j] == 1) {
+            fprintf(file, "%c %c\n", lstVertices[i]->label, lstVertices[j]->label);
+         }
+      }
+   }
+
+   fclose(file);
+   printf("Graph saved to file.\n");
+}
+
+int main() {
+   int choice;
+   char label1, label2;
+   for (int i = 0; i < MAX; i++)
+      for (int j = 0; j < MAX; j++)
+         adjMatrix[i][j] = 0;
+
+   while (1) {
+      printf("\nGraph Operations Menu:\n");
+      printf("1. Add Vertex\n");
+      printf("2. Add Edge\n");
+      printf("3. Display Adjacency Matrix\n");
+      printf("4. Depth First Search\n");
+      printf("5. Breadth First Search\n");
+      printf("6. Check Adjacency\n");
+      printf("7. Get Neighbors\n");
+      printf("8. Remove Edge\n");
+      printf("9. Remove Vertex\n");
+      printf("10. Save Graph to File and Exit\n");
+      printf("Enter your choice: ");
+      scanf("%d", &choice);
+
+      switch (choice) {
+         case 1:
+            printf("Enter label for new vertex: ");
+            scanf(" %c", &label1);
+            addVertex(label1);
+            break;
+         case 2:
+            printf("Enter two vertices to add an edge (e.g., A B): ");
+            scanf(" %c %c", &label1, &label2);
+            int start = -1, end = -1;
+            for (int i = 0; i < vertexCount; i++) {
+               if (lstVertices[i]->label == label1) start = i;
+               if (lstVertices[i]->label == label2) end = i;
+            }
+            if (start != -1 && end != -1) addEdge(start, end);
+            else printf("One or both vertices not found!\n");
+            break;
+         case 3:
+            printAdjMatrix();
+            break;
+         case 4:
+            depthFirstSearch();
+            break;
+         case 5:
+            breadthFirstSearch();
+            break;
+         case 6:
+            printf("Enter two vertices to check adjacency (e.g., A B): ");
+            scanf(" %c %c", &label1, &label2);
+            checkAdjacency(label1, label2);
+            break;
+         case 7:
+            printf("Enter vertex label to get neighbors: ");
+            scanf(" %c", &label1);
+            getNeighbors(label1);
+            break;
+         case 8:
+            printf("Enter two vertices to remove the edge (e.g., A B): ");
+            scanf(" %c %c", &label1, &label2);
+            removeEdge(label1, label2);
+            break;
+         case 9:
+            printf("Enter vertex label to remove: ");
+            scanf(" %c", &label1);
+            removeVertex(label1);
+            break;
+         case 10:
+            saveGraphToFile();
+            printf("Exiting...\n");
+            exit(0);
+         default:
+            printf("Invalid choice! Please try again.\n");
+      }
+   }
+   return 0;
+}
